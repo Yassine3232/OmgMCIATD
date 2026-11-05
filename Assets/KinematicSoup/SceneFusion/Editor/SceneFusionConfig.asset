@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SceneFusionConfig
   m_EditorClassIdentifier: KinematicSoup.SceneFusion.Editor::KS.SceneFusion.Client.Unity.Editor.sfConfig
   Debug: 1
-  LastVersion: 0.0.0
+  LastVersion: 2.0.5
   ShowGettingStartedScreen: 1
   m_syncMaterials: 1
   m_syncPrefabs: 1
