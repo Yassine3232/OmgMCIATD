@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 054433cc78126fe478e0ed8b033bf182
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 285247
+  packageName: Scene Fusion 2 Lite - Real-time Collaboration
+  packageVersion: 2.0.5
+  assetPath: Assets/com.kinematicsoup.scenefusion2lite/Source/Editor/AssetStore/sfLocalSession.cs
+  uploadId: 967254

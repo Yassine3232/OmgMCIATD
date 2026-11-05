@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 8ff60b6cf55bb1b46936358f31ffcd26
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 285247
+  packageName: Scene Fusion 2 Lite - Real-time Collaboration
+  packageVersion: 2.0.5
+  assetPath: Assets/com.kinematicsoup.scenefusion2lite/Source/sfTextMeshOutline.cs
+  uploadId: 967254

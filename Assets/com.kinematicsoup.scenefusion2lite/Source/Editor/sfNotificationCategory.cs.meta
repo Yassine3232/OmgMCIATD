@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: b4e8a033bcbe5b348ab23fb3b41f5fc4
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 285247
+  packageName: Scene Fusion 2 Lite - Real-time Collaboration
+  packageVersion: 2.0.5
+  assetPath: Assets/com.kinematicsoup.scenefusion2lite/Source/Editor/sfNotificationCategory.cs
+  uploadId: 967254

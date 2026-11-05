@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 5efe6de1cc1c6a34dbbb4a8935edd531
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 285247
+  packageName: Scene Fusion 2 Lite - Real-time Collaboration
+  packageVersion: 2.0.5
+  assetPath: Assets/com.kinematicsoup.scenefusion2lite/CHANGELOG.md
+  uploadId: 967254
