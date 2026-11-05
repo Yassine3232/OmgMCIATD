@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 0b44958e5d1735345b101619e7ede25a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 285247
+  packageName: Scene Fusion 2 Lite - Real-time Collaboration
+  packageVersion: 2.0.5
+  assetPath: Assets/com.kinematicsoup.scenefusion2lite/Source/Editor/AssetStore/sfGettingStartedWindow.cs
+  uploadId: 967254
