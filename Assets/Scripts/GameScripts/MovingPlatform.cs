@@ -2,126 +2,75 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // =====================================================================
-// MovingPlatform : plateforme qui fait des allers-retours et
-// transporte le joueur posé dessus.
-// =====================================================================
-// FONCTIONNEMENT :
-// 1. La plateforme part de sa position de départ (A).
-// 2. Elle se déplace vers A + deplacement (B), attend, puis revient.
-// 3. Chaque "passager" (joueur) posé dessus est déplacé du même
-//    montant, sinon la plateforme glisserait sous ses pieds.
+// MovingPlatform : la plateforme va du point A au point B, et revient.
 //
 // MISE EN PLACE :
-// - Un Collider NON trigger (le joueur doit pouvoir marcher dessus).
-// - Le Rigidbody est ajouté automatiquement et réglé en "Kinematic".
-// - Le joueur doit avoir le tag "Player".
+// 1. Créez 2 GameObjects vides (A et B), PAS en enfant de la plateforme.
+// 2. Glissez-les dans les champs "Point A" et "Point B".
+// 3. Un Collider NON trigger sur la plateforme, un joueur avec le tag
+//    "Player" et un Rigidbody.
 // =====================================================================
 [RequireComponent(typeof(Rigidbody))]
 public class MovingPlatform : MonoBehaviour
 {
-    [Header("Mouvement")]
-    // Déplacement entre le point A (départ) et le point B.
-    // Exemple : (6, 0, 0) = la plateforme va 6 unités vers la droite.
-    [SerializeField] private Vector3 deplacement = new Vector3(6f, 0f, 0f);
-
-    // Vitesse en unités par seconde.
+    [SerializeField] private Transform pointA;
+    [SerializeField] private Transform pointB;
     [SerializeField] private float vitesse = 2f;
 
-    // Pause aux extrémités (en secondes).
-    [SerializeField] private float tempsPause = 1f;
-
     private Rigidbody corps;
-    private Collider collisionneur;
-    private Vector3 pointA;
-    private Vector3 pointB;
+    private Vector3 positionActuelle;
     private Vector3 destination;
-    private float minuteurPause;
-
-    // Rigidbody des objets actuellement posés sur la plateforme.
     private readonly List<Rigidbody> passagers = new List<Rigidbody>();
 
     private void Awake()
     {
         corps = GetComponent<Rigidbody>();
-        collisionneur = GetComponent<Collider>();
-
-        // Kinematic : la plateforme est déplacée par le script,
-        // pas par la gravité ni par les chocs.
         corps.isKinematic = true;
         corps.interpolation = RigidbodyInterpolation.Interpolate;
 
-        pointA = transform.position;
-        pointB = pointA + deplacement;
-        destination = pointB;
+        positionActuelle = pointA.position;
+        destination = pointB.position;
+        corps.position = positionActuelle;
     }
 
     private void FixedUpdate()
     {
-        // Phase d'attente à une extrémité.
-        if (minuteurPause > 0f)
-        {
-            minuteurPause -= Time.fixedDeltaTime;
-            return;
-        }
-
-        // Calcul du prochain pas de déplacement.
         Vector3 nouvellePosition = Vector3.MoveTowards(
-            corps.position, destination, vitesse * Time.fixedDeltaTime);
-        Vector3 deltaMouvement = nouvellePosition - corps.position;
+            positionActuelle, destination, vitesse * Time.fixedDeltaTime);
+        Vector3 delta = nouvellePosition - positionActuelle;
 
+        positionActuelle = nouvellePosition;
         corps.MovePosition(nouvellePosition);
 
-        // On déplace les passagers du même montant que la plateforme.
+        // Les passagers bougent du même montant.
         foreach (Rigidbody passager in passagers)
         {
-            if (passager != null) passager.position += deltaMouvement;
+            passager.MovePosition(passager.position + delta);
         }
 
-        // Extrémité atteinte : on inverse la destination et on attend.
-        if (Vector3.Distance(nouvellePosition, destination) < 0.01f)
+        // Arrivé : on repart dans l'autre sens.
+        if (positionActuelle == destination)
         {
-            destination = (destination == pointB) ? pointA : pointB;
-            minuteurPause = tempsPause;
+            destination = (destination == pointA.position) ? pointB.position : pointA.position;
         }
     }
 
-    // OnCollisionStay est appelée à chaque pas physique tant qu'un objet
-    // touche la plateforme : on vérifie s'il est bien DESSUS (et pas à côté).
+    // Le joueur est-il DESSUS ? (la normale du contact pointe vers le bas)
     private void OnCollisionStay(Collision collision)
     {
         if (!collision.gameObject.CompareTag("Player")) return;
+        if (collision.rigidbody == null) return;
 
-        Rigidbody rb = collision.rigidbody;
-        if (rb == null) return;
+        bool estDessus = collision.GetContact(0).normal.y < -0.5f;
 
-        // Les pieds du joueur sont-ils au niveau du dessus de la plateforme ?
-        bool estDessus = collision.collider.bounds.min.y >= collisionneur.bounds.max.y - 0.2f;
-
-        if (estDessus && !passagers.Contains(rb))
-        {
-            passagers.Add(rb);
-        }
+        if (estDessus && !passagers.Contains(collision.rigidbody))
+            passagers.Add(collision.rigidbody);
         else if (!estDessus)
-        {
-            passagers.Remove(rb);
-        }
+            passagers.Remove(collision.rigidbody);
     }
 
-    // Le joueur quitte la plateforme : il n'est plus transporté.
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.rigidbody != null)
-        {
-            passagers.Remove(collision.rigidbody);
-        }
-    }
-
-    // Affiche le trajet dans la vue Scene (aide au réglage).
-    private void OnDrawGizmosSelected()
-    {
-        Vector3 depart = Application.isPlaying ? pointA : transform.position;
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawLine(depart, depart + deplacement);
-        Gizmos.DrawWireSphere(depart + deplacement, 0.3f);
+        if (collision.rigidbody != null) passagers.Remove(collision.rigidbody);
     }
 }
