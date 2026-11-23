@@ -2047,6 +2047,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f536d9486cda06b4aac66534373649c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  viesMax: 3
+  viesActuelles: 3
+  delaiInvulnerabilite: 0.5
+  uiPrefab: {fileID: 100100000, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+  uiManager: {fileID: 0}
   vitesse: 5
   seuilVitesseChute: -12
   tagImmeuble: Building
@@ -5106,6 +5111,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f536d9486cda06b4aac66534373649c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  viesMax: 3
+  viesActuelles: 3
+  delaiInvulnerabilite: 0.5
+  uiPrefab: {fileID: 100100000, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+  uiManager: {fileID: 0}
   vitesse: 5
   seuilVitesseChute: -12
   tagImmeuble: Building

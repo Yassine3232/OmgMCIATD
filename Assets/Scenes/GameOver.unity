@@ -342,6 +342,7 @@ GameObject:
   - component: {fileID: 897258802}
   - component: {fileID: 897258801}
   - component: {fileID: 897258800}
+  - component: {fileID: 897258803}
   m_Layer: 5
   m_Name: Restart
   m_TagString: Untagged
@@ -412,7 +413,31 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 897258801}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 897258803}
+        m_TargetAssemblyTypeName: GameOverMenu, Assembly-CSharp
+        m_MethodName: RestartGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &897258803
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 897258798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3a48e718b534125b01859c8646b9781, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameOverMenu
 --- !u!114 &897258801
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -2047,6 +2047,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f536d9486cda06b4aac66534373649c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  viesMax: 3
+  viesActuelles: 3
+  delaiInvulnerabilite: 0.5
+  uiPrefab: {fileID: 100100000, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+  uiManager: {fileID: 0}
   vitesse: 5
   seuilVitesseChute: -12
   tagImmeuble: Building
@@ -4713,6 +4718,103 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 822277329}
   m_SourcePrefab: {fileID: 100100000, guid: 9334bc948e16ab848931c729fd92a912, type: 3}
+--- !u!1001 &557966532
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922282942386601519, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8660947664733839392, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+      propertyPath: m_Name
+      value: UI
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
 --- !u!1001 &572733218
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5106,6 +5208,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f536d9486cda06b4aac66534373649c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  viesMax: 3
+  viesActuelles: 3
+  delaiInvulnerabilite: 0.5
+  uiPrefab: {fileID: 100100000, guid: 694f4bd78f8aca64b9fb0ad12dcd6f2f, type: 3}
+  uiManager: {fileID: 0}
   vitesse: 5
   seuilVitesseChute: -12
   tagImmeuble: Building
@@ -15998,3 +16105,4 @@ SceneRoots:
   - {fileID: 1383981437}
   - {fileID: 605800465}
   - {fileID: 1790649214}
+  - {fileID: 557966532}
