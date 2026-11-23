@@ -32,6 +32,18 @@ public class PlayerController : MonoBehaviour
     // Vitesse de marche en unités/seconde.
     [SerializeField] private float vitesse = 5f;
 
+    [Header("Chute et Impact")]
+    // Vitesse verticale négative à partir de laquelle on considère une chute de haut (ex: -12).
+    [SerializeField] private float seuilVitesseChute = -12f;
+
+    // Tag des immeubles/obstacles (ou laissez vide pour détecter tout choc latéral).
+    [SerializeField] private string tagImmeuble = "Building";
+    private static readonly int ParamChuteImmeuble = Animator.StringToHash("FallImpact");
+    private static readonly int ParamHit = Animator.StringToHash("Hit");
+
+    // Mémorise si le joueur a atteint une grande vitesse de chute en l'air.
+    private bool chuteDeHautEnCours = false;
+
     [Header("Orientation")]
     // Coché : le joueur regarde toujours dans la direction de la caméra.
     // Décoché : il se tourne seulement vers la direction où il marche.
@@ -72,8 +84,9 @@ public class PlayerController : MonoBehaviour
 
     // Les noms des paramètres Animator sont convertis en nombres (hash) :
     // c'est plus rapide que d'utiliser des chaînes à chaque image.
-    private static readonly int ParamVitesse = Animator.StringToHash("Speed");
+    private static readonly int ParamVitesse = Animator.StringToHash("Vitesse");
     private static readonly int ParamAuSol = Animator.StringToHash("IsGrounded");
+    private static readonly int ParamSaut = Animator.StringToHash("Jump");
 
     private Rigidbody corps;
     private Collider collisionneur;
@@ -153,6 +166,7 @@ public class PlayerController : MonoBehaviour
         // On mémorise l'instant où la touche Saut (Espace) est pressée.
         if (Input.GetButtonDown("Jump"))
         {
+            
             dernierAppuiSaut = Time.time;
         }
     }
@@ -177,14 +191,16 @@ public class PlayerController : MonoBehaviour
 
         if (veutSauter && peutSauter)
         {
-            // Formule physique : v = racine(2 * g * h)
-            // donne la vitesse de départ pour atteindre la hauteur voulue.
             vitesseActuelle.y =
                 Mathf.Sqrt(2f * Mathf.Abs(Physics.gravity.y) * hauteurSaut);
 
-            // On "consomme" le saut pour éviter un double saut involontaire.
             dernierAppuiSaut = -10f;
             dernierInstantAuSol = -10f;
+
+            if (animator != null)
+            {
+                animator.SetTrigger(ParamSaut);
+            }
 
             if (AudioManager.Instance != null)
             {
@@ -196,6 +212,21 @@ public class PlayerController : MonoBehaviour
             // En descente : on ajoute de la gravité pour une chute plus nerveuse.
             vitesseActuelle.y += Physics.gravity.y
                 * (multiplicateurChute - 1f) * Time.fixedDeltaTime;
+        }
+
+        if (!EstAuSol && vitesseActuelle.y < seuilVitesseChute)
+        {
+            chuteDeHautEnCours = true;
+        }
+
+        // Dès qu'il touche le sol après une chute de haut, on lance l'animation d'écrasement
+        if (EstAuSol && chuteDeHautEnCours)
+        {
+            chuteDeHautEnCours = false;
+            if (animator != null)
+            {
+                animator.SetTrigger(ParamChuteImmeuble);
+            }
         }
 
         corps.linearVelocity = vitesseActuelle;
@@ -282,5 +313,23 @@ public class PlayerController : MonoBehaviour
     private bool JoueurPeutAgir()
     {
         return GameManager.Instance == null || GameManager.Instance.JeuEnCours;
+    }
+
+    // Détecte le choc quand le joueur percute un immeuble sur le côté
+    private void OnCollisionEnter(Collision collision)
+    {
+
+        // Vérifie que le choc est latéral (un mur/immeuble) et non sous les pieds (le sol)
+        foreach (ContactPoint contact in collision.contacts)
+        {
+            if (Mathf.Abs(contact.normal.y) < 0.5f)
+            {
+                if (animator != null)
+                {
+                    animator.SetTrigger(ParamHit);
+                }
+                break;
+            }
+        }
     }
 }
