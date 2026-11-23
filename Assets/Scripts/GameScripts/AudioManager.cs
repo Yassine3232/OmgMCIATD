@@ -23,8 +23,6 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip sonSaut;
     [SerializeField] private AudioClip sonCollecte;
     [SerializeField] private AudioClip sonDegat;
-    [SerializeField] private AudioClip sonCheckpoint;
-    [SerializeField] private AudioClip sonLevier;
     [SerializeField] private AudioClip sonPorte;
     [SerializeField] private AudioClip sonVictoire;
     [SerializeField] private AudioClip sonDefaite;
@@ -73,8 +71,6 @@ public class AudioManager : MonoBehaviour
     public void JouerSaut() { Jouer(sonSaut); }
     public void JouerCollecte() { Jouer(sonCollecte); }
     public void JouerDegat() { Jouer(sonDegat); }
-    public void JouerCheckpoint() { Jouer(sonCheckpoint); }
-    public void JouerLevier() { Jouer(sonLevier); }
     public void JouerPorte() { Jouer(sonPorte); }
 
     public void JouerVictoire()
