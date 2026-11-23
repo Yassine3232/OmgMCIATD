@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // =====================================================================
 // PlayerController : contrôle du joueur (déplacement, saut, animation).
@@ -28,6 +29,18 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
+    [Header("Vies et Réapparition")]
+    [SerializeField] private int viesMax = 3;
+    [SerializeField] private int viesActuelles = 3;
+    [SerializeField] private float delaiInvulnerabilite = 0.5f;
+    [SerializeField] private GameObject uiPrefab;
+    [SerializeField] private UIManager uiManager;
+
+    private Vector3 positionDepart;
+    private Quaternion rotationDepart;
+    private float finInvulnerabilite = 0f;
+    private CameraFollow cameraSuiveuse;
+
     [Header("Déplacement")]
     // Vitesse de marche en unités/seconde.
     [SerializeField] private float vitesse = 5f;
@@ -127,6 +140,65 @@ public class PlayerController : MonoBehaviour
         if (cameraTransform == null && Camera.main != null)
         {
             cameraTransform = Camera.main.transform;
+        }
+
+        positionDepart = transform.position;
+        rotationDepart = transform.rotation;
+        viesActuelles = viesMax;
+    }
+
+    private void Start()
+    {
+        InitialiserUI();
+    }
+
+    private void InitialiserUI()
+    {
+        if (uiManager == null)
+        {
+            uiManager = UIManager.Instance ?? FindFirstObjectByType<UIManager>();
+        }
+
+        if (uiManager == null)
+        {
+            GameObject uiExistant = GameObject.Find("UI");
+            if (uiExistant != null)
+            {
+                uiManager = uiExistant.GetComponent<UIManager>();
+                if (uiManager == null) uiManager = uiExistant.AddComponent<UIManager>();
+            }
+        }
+
+        if (uiManager == null)
+        {
+            GameObject prefabAInstancier = uiPrefab;
+            if (prefabAInstancier == null)
+            {
+                prefabAInstancier = Resources.Load<GameObject>("UI");
+            }
+#if UNITY_EDITOR
+            if (prefabAInstancier == null)
+            {
+                prefabAInstancier = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/UI.prefab");
+            }
+#endif
+            if (prefabAInstancier != null)
+            {
+                GameObject inst = Instantiate(prefabAInstancier);
+                inst.name = "UI";
+                uiManager = inst.GetComponent<UIManager>();
+                if (uiManager == null) uiManager = inst.AddComponent<UIManager>();
+            }
+        }
+
+        if (cameraSuiveuse == null)
+        {
+            cameraSuiveuse = FindFirstObjectByType<CameraFollow>();
+        }
+
+        if (uiManager != null)
+        {
+            uiManager.MettreAJourVies(viesActuelles, viesMax);
         }
     }
 
@@ -269,6 +341,14 @@ public class PlayerController : MonoBehaviour
             // On ignore les colliders du joueur lui-même.
             if (resultatsSol[i].transform.IsChildOf(transform)) continue;
             EstAuSol = true;
+
+            // Si le sol touché est Grass, SideWalk ou Plane
+            if (EstObstacleMortel(resultatsSol[i].gameObject))
+            {
+                PerdreCoeurEtReapparaitre();
+                return;
+            }
+
             break;
         }
 
@@ -307,6 +387,7 @@ public class PlayerController : MonoBehaviour
         transform.position = position;
         corps.linearVelocity = Vector3.zero;
         corps.angularVelocity = Vector3.zero;
+        Physics.SyncTransforms();
     }
 
     // Vrai si le jeu est en cours (ni pause, ni victoire, ni défaite).
@@ -315,10 +396,9 @@ public class PlayerController : MonoBehaviour
         return GameManager.Instance == null || GameManager.Instance.JeuEnCours;
     }
 
-    // Détecte le choc quand le joueur percute un immeuble sur le côté
+    // Détecte le choc quand le joueur percute un immeuble sur le côté ou un obstacle
     private void OnCollisionEnter(Collision collision)
     {
-
         // Vérifie que le choc est latéral (un mur/immeuble) et non sous les pieds (le sol)
         foreach (ContactPoint contact in collision.contacts)
         {
@@ -330,6 +410,120 @@ public class PlayerController : MonoBehaviour
                 }
                 break;
             }
+        }
+
+        VerifierContactObstacle(collision.gameObject);
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        VerifierContactObstacle(collision.gameObject);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        VerifierContactObstacle(other.gameObject);
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        VerifierContactObstacle(other.gameObject);
+    }
+
+    private void VerifierContactObstacle(GameObject objet)
+    {
+        if (objet == null) return;
+        if (Time.time < finInvulnerabilite) return;
+
+        if (EstObstacleMortel(objet))
+        {
+            PerdreCoeurEtReapparaitre();
+        }
+    }
+
+    public bool EstObstacleMortel(GameObject objet)
+    {
+        if (objet == null) return false;
+        if (objet.transform.IsChildOf(transform) || objet.transform == transform) return false;
+
+        if (ContientNomObstacle(objet.name)) return true;
+        if (objet.transform.parent != null && ContientNomObstacle(objet.transform.parent.name)) return true;
+        if (objet.transform.root != null && ContientNomObstacle(objet.transform.root.name)) return true;
+
+        return false;
+    }
+
+    private bool ContientNomObstacle(string nom)
+    {
+        if (string.IsNullOrEmpty(nom)) return false;
+        string s = nom.ToLowerInvariant();
+        return s.Contains("grass") || s.Contains("sidewalk") || s.Contains("plane");
+    }
+
+    public void PerdreCoeurEtReapparaitre()
+    {
+        if (Time.time < finInvulnerabilite) return;
+        finInvulnerabilite = Time.time + delaiInvulnerabilite;
+
+        // Si GameManager est présent dans la scène, on le prévient en priorité
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.JoueurToucheObstacle();
+            return;
+        }
+
+        // Sinon, gestion autonome complète :
+        viesActuelles--;
+        if (viesActuelles < 0) viesActuelles = 0;
+
+        // Mise à jour de l'UI
+        if (uiManager == null)
+        {
+            uiManager = UIManager.Instance ?? FindFirstObjectByType<UIManager>();
+        }
+        if (uiManager != null)
+        {
+            uiManager.MettreAJourVies(viesActuelles, viesMax);
+        }
+
+        // Retour au spawn
+        RetournerAuSpawn();
+
+        // Si toutes les vies sont perdues, déclencher le Game Over
+        if (viesActuelles <= 0)
+        {
+            DeclencherGameOver();
+        }
+    }
+
+    public void RetournerAuSpawn()
+    {
+        Reapparaitre(positionDepart);
+        transform.rotation = rotationDepart;
+
+        if (cameraSuiveuse == null)
+        {
+            cameraSuiveuse = FindFirstObjectByType<CameraFollow>();
+        }
+        if (cameraSuiveuse != null)
+        {
+            cameraSuiveuse.TeleporterSurCible();
+        }
+
+        Physics.SyncTransforms();
+    }
+
+    private void DeclencherGameOver()
+    {
+        if (Application.CanStreamedLevelBeLoaded("GameOver"))
+        {
+            Time.timeScale = 1f;
+            SceneManager.LoadScene("GameOver");
+        }
+        else
+        {
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 }
