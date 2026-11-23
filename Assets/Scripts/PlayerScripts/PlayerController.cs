@@ -84,7 +84,7 @@ public class PlayerController : MonoBehaviour
 
     // Les noms des paramètres Animator sont convertis en nombres (hash) :
     // c'est plus rapide que d'utiliser des chaînes à chaque image.
-    private static readonly int ParamVitesse = Animator.StringToHash("Speed");
+    private static readonly int ParamVitesse = Animator.StringToHash("Vitesse");
     private static readonly int ParamAuSol = Animator.StringToHash("IsGrounded");
     private static readonly int ParamSaut = Animator.StringToHash("Jump");
 
