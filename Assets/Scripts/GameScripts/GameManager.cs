@@ -272,6 +272,12 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
+    // Charge une scène par son nom. À relier à un bouton (OnClick) avec le nom en paramètre.
+    public void ChargerScene(string nomScene)
+    {
+        Time.timeScale = 1f; // sinon le jeu reste figé si on vient d'une pause/victoire/défaite
+        SceneManager.LoadScene(nomScene);
+    }
 
     public void Quitter()
     {
