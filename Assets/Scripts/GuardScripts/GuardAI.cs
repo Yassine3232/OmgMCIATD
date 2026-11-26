@@ -20,6 +20,9 @@ using UnityEngine.AI;
 // 2. Le garde a un NavMeshAgent (ajouté auto.).
 // 3. Ajouter un Collider "Is Trigger" sur le garde (zone de capture).
 // 4. Glisser les points de patrouille (objets vides) dans la liste.
+// 5. Animator (sur le garde ou un enfant) avec AC_Guard3D :
+//    - "Speed" (float) : 0 = immobile, ~0.45 = marche, 1 = course
+//    - "Interaction" (trigger) : coup de poing quand il attrape le joueur
 // =====================================================================
 [RequireComponent(typeof(NavMeshAgent))]
 public class GuardAI : MonoBehaviour
@@ -54,6 +57,22 @@ public class GuardAI : MonoBehaviour
     // Couches qui bloquent la vue (murs...). Par défaut : tout.
     [SerializeField] private LayerMask couchesObstacles = ~0;
 
+    [Header("Animation")]
+    // Animator du modèle (cherché automatiquement dans les enfants si vide).
+    [SerializeField] private Animator animator;
+
+    // Durée pendant laquelle le garde s'arrête pour frapper (en secondes).
+    [SerializeField] private float dureeAttaque = 1f;
+
+    // Lissage de la vitesse envoyée à l'Animator (évite les sauts d'animation).
+    [SerializeField] private float lissageAnimation = 0.1f;
+
+    private static readonly int ParamVitesse = Animator.StringToHash("Speed");
+    private static readonly int ParamAttaque = Animator.StringToHash("Interaction");
+
+    private float finAttaque;
+    private bool attaqueEnCours;
+
     private NavMeshAgent agent;
     private Transform joueur;
     private Etat etat = Etat.Patrouille;
@@ -67,6 +86,11 @@ public class GuardAI : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         positionDepart = transform.position;
+
+        if (animator == null) animator = GetComponentInChildren<Animator>();
+
+        // Le NavMeshAgent déplace le garde, pas l'animation.
+        if (animator != null) animator.applyRootMotion = false;
     }
 
     private void Start()
@@ -79,9 +103,17 @@ public class GuardAI : MonoBehaviour
 
     private void Update()
     {
-        if (joueur == null) return;
+        MettreAJourAnimation();
 
-        bool voitJoueur = PeutVoirJoueur();
+        // Pendant le coup de poing, le garde reste sur place.
+        if (Time.time < finAttaque) return;
+        if (attaqueEnCours)
+        {
+            attaqueEnCours = false;
+            agent.isStopped = false;
+        }
+
+            bool voitJoueur = joueur != null && PeutVoirJoueur();
         if (voitJoueur) dernierInstantVu = Time.time;
 
         switch (etat)
@@ -147,6 +179,11 @@ public class GuardAI : MonoBehaviour
 
     private void MettreAJourPoursuite()
     {
+        if (joueur == null)
+        {
+            PasserEnRetour();
+            return;
+        }
         // Le garde fonce vers la position actuelle du joueur.
         agent.SetDestination(joueur.position);
 
@@ -217,10 +254,41 @@ public class GuardAI : MonoBehaviour
         return false;
     }
 
-    // Trigger de capture : le garde touche le joueur -> on prévient le GameManager.
+    // Envoie la vitesse réelle du garde à l'Animator, ramenée entre 0 et 1.
+    // Marche (2 / 4.5 = 0.44) et course (4.5 / 4.5 = 1) tombent de part
+    // et d'autre du seuil 0.6 des transitions Walking <-> Running.
+    private void MettreAJourAnimation()
+    {
+        if (animator == null) return;
+
+        float vitesse = agent.velocity.magnitude / Mathf.Max(vitessePoursuite, 0.01f);
+        animator.SetFloat(ParamVitesse, vitesse, lissageAnimation, Time.deltaTime);
+    }
+
+    // Trigger de capture : le garde touche le joueur -> il frappe
+    // et on prévient le GameManager.
     private void OnTriggerEnter(Collider autre)
     {
         if (!autre.CompareTag("Player")) return;
+
+        // Évite de frapper plusieurs fois pendant la même attaque.
+        if (Time.time < finAttaque) return;
+
+        finAttaque = Time.time + dureeAttaque;
+        attaqueEnCours = true;
+        agent.isStopped = true;
+        agent.velocity = Vector3.zero;
+
+        if (animator != null)
+        {
+            // Tourner le garde vers le joueur avant de frapper.
+            Vector3 direction = autre.transform.position - transform.position;
+            direction.y = 0f;
+            if (direction.sqrMagnitude > 0.001f)
+                transform.rotation = Quaternion.LookRotation(direction);
+
+            animator.SetTrigger(ParamAttaque);
+        }
 
         if (GameManager.Instance != null)
         {

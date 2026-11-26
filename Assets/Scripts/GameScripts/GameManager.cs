@@ -166,6 +166,12 @@ public class GameManager : MonoBehaviour
         InfligerDegat(true);
     }
 
+    // Appelée quand le joueur touche un obstacle mortel (Grass, SideWalk, Plane).
+    public void JoueurToucheObstacle()
+    {
+        InfligerDegat(true);
+    }
+
     // Appelée par ZoneSortie : le joueur atteint la sortie.
     public void AtteindreSortie()
     {
@@ -222,11 +228,21 @@ public class GameManager : MonoBehaviour
         Etat = EtatJeu.Defaite;
         if (son != null) son.JouerDefaite();
         if (ui != null) ui.AfficherDefaite(Score);
-        Time.timeScale = 0f;
+
+        if (Application.CanStreamedLevelBeLoaded("GameOver"))
+        {
+            Time.timeScale = 1f;
+            SceneManager.LoadScene("GameOver");
+        }
+        else
+        {
+            Time.timeScale = 0f;
+        }
     }
 
     private void RafraichirInterface()
     {
+        if (ui == null) ui = UIManager.Instance ?? FindFirstObjectByType<UIManager>();
         if (ui == null) return;
         ui.MettreAJourVies(Vies, viesMax);
         ui.MettreAJourScore(Score);
@@ -271,6 +287,12 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+    // Charge une scène par son nom. À relier à un bouton (OnClick) avec le nom en paramètre.
+    public void ChargerScene(string nomScene)
+    {
+        Time.timeScale = 1f; // sinon le jeu reste figé si on vient d'une pause/victoire/défaite
+        SceneManager.LoadScene(nomScene);
     }
 
     public void Quitter()

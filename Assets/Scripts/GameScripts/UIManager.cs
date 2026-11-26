@@ -1,25 +1,28 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 // =====================================================================
 // UIManager : affichage du HUD et des menus.
 // =====================================================================
 // RÔLE : uniquement de l'AFFICHAGE. Ce script ne décide jamais de rien :
-// c'est le GameManager qui l'appelle quand quelque chose change.
-//
-// MISE EN PLACE :
-// - Créer un Canvas avec des textes TextMeshPro (TMP) pour le HUD.
-// - Créer 3 panneaux (Pause, Victoire, Défaite), désactivés au départ.
-// - Sur chaque bouton, dans OnClick, appeler une méthode du GameManager :
-//     Reprendre() / Redemarrer() / Quitter()
+// c'est le GameManager ou PlayerController qui l'appelle quand quelque chose change.
 // =====================================================================
 public class UIManager : MonoBehaviour
 {
+    public static UIManager Instance { get; private set; }
+
     [Header("HUD")]
     [SerializeField] private TMP_Text texteVies;
     [SerializeField] private TMP_Text texteScore;
     [SerializeField] private TMP_Text texteNourriture;
+
+    [Header("HUD - Coeurs")]
+    [SerializeField] private Image[] coeurs;
+    [SerializeField] private Sprite coeurRouge;
+    [SerializeField] private Sprite coeurVide;
 
     // Message temporaire au centre de l'écran ("Point de contrôle !"...).
     [SerializeField] private TMP_Text texteMessage;
@@ -36,6 +39,18 @@ public class UIManager : MonoBehaviour
 
     private Coroutine messageEnCours;
 
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+
+        InitialiserCoeurs();
+    }
+
     private void Start()
     {
         // Au démarrage, tous les menus sont cachés.
@@ -43,6 +58,69 @@ public class UIManager : MonoBehaviour
         if (panneauVictoire != null) panneauVictoire.SetActive(false);
         if (panneauDefaite != null) panneauDefaite.SetActive(false);
         if (texteMessage != null) texteMessage.gameObject.SetActive(false);
+
+        // Initialiser l'affichage avec 3 coeurs pleins par défaut
+        MettreAJourCoeurs(3);
+    }
+
+    public void InitialiserCoeurs()
+    {
+        if (coeurRouge == null)
+        {
+            coeurRouge = Resources.Load<Sprite>("UI/Red Heart");
+        }
+        if (coeurVide == null)
+        {
+            coeurVide = Resources.Load<Sprite>("UI/Empty Heart");
+        }
+#if UNITY_EDITOR
+        if (coeurRouge == null)
+        {
+            coeurRouge = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/UI/Red Heart.jpg");
+        }
+        if (coeurVide == null)
+        {
+            coeurVide = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/UI/Empty Heart.jpg");
+        }
+#endif
+
+        if (coeurs == null || coeurs.Length == 0)
+        {
+            TrouverCoeurs();
+        }
+    }
+
+    public void TrouverCoeurs()
+    {
+        Transform conteneurCoeurs = transform.Find("Hearts");
+        if (conteneurCoeurs == null)
+        {
+            foreach (Transform t in GetComponentsInChildren<Transform>(true))
+            {
+                if (t.name.Equals("Hearts", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    conteneurCoeurs = t;
+                    break;
+                }
+            }
+        }
+
+        if (conteneurCoeurs != null)
+        {
+            List<Image> liste = new List<Image>();
+            for (int i = 0; i < conteneurCoeurs.childCount; i++)
+            {
+                Image img = conteneurCoeurs.GetChild(i).GetComponent<Image>();
+                if (img != null)
+                {
+                    liste.Add(img);
+                }
+            }
+
+            // Trier de gauche à droite selon la position X
+            liste.Sort((a, b) => a.rectTransform.anchoredPosition.x.CompareTo(b.rectTransform.anchoredPosition.x));
+            coeurs = liste.ToArray();
+        }
     }
 
     // ---------------------------- HUD ----------------------------
@@ -50,6 +128,45 @@ public class UIManager : MonoBehaviour
     public void MettreAJourVies(int vies, int viesMax)
     {
         if (texteVies != null) texteVies.text = $"Vies : {vies}/{viesMax}";
+        MettreAJourCoeurs(vies);
+    }
+
+    public void MettreAJourCoeurs(int vies)
+    {
+        if (coeurs == null || coeurs.Length == 0)
+        {
+            TrouverCoeurs();
+        }
+
+#if UNITY_EDITOR
+        if (coeurRouge == null || coeurVide == null)
+        {
+            InitialiserCoeurs();
+        }
+#endif
+
+        if (coeurs != null)
+        {
+            for (int i = 0; i < coeurs.Length; i++)
+            {
+                if (coeurs[i] == null) continue;
+
+                if (i < vies)
+                {
+                    if (coeurRouge != null)
+                    {
+                        coeurs[i].sprite = coeurRouge;
+                    }
+                }
+                else
+                {
+                    if (coeurVide != null)
+                    {
+                        coeurs[i].sprite = coeurVide;
+                    }
+                }
+            }
+        }
     }
 
     public void MettreAJourScore(int score)
