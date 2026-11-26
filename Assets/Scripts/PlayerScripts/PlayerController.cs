@@ -36,8 +36,6 @@ public class PlayerController : MonoBehaviour
     // Vitesse verticale négative à partir de laquelle on considère une chute de haut (ex: -12).
     [SerializeField] private float seuilVitesseChute = -12f;
 
-    // Tag des immeubles/obstacles (ou laissez vide pour détecter tout choc latéral).
-    [SerializeField] private string tagImmeuble = "Building";
     private static readonly int ParamChuteImmeuble = Animator.StringToHash("FallImpact");
     private static readonly int ParamHit = Animator.StringToHash("Hit");
 
@@ -326,6 +324,7 @@ public class PlayerController : MonoBehaviour
             {
                 if (animator != null)
                 {
+                    // Trigger seulement quand c'est un enemi vérifier le tag
                     animator.SetTrigger(ParamHit);
                 }
                 break;

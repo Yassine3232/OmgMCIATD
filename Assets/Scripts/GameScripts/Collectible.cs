@@ -4,9 +4,8 @@ using UnityEngine;
 // Collectible : nourriture que le joueur peut ramasser.
 // =====================================================================
 // RÔLE :
-// 1. Tourner et flotter pour attirer l'œil (animation décorative).
-// 2. Détecter le joueur avec un Trigger.
-// 3. Prévenir le GameManager, puis disparaître.
+// 1. Détecter le joueur avec un Trigger.
+// 2. Prévenir le GameManager, puis disparaître.
 //
 // MISE EN PLACE : un Collider avec "Is Trigger" coché (fait auto. par
 // Reset() quand on ajoute le script). Le joueur doit avoir le tag "Player".
@@ -17,10 +16,6 @@ public class Collectible : MonoBehaviour
     [Header("Valeur")]
     // Points gagnés par le joueur.
     [SerializeField] private int points = 10;
-
-    [Header("Animation décorative")]
-    // Rotation autour de l'axe Y en degrés/seconde.
-    [SerializeField] private float vitesseRotation = 60f;
 
     // Hauteur maximale du flottement (en unités).
     [SerializeField] private float amplitudeFlottement = 0.15f;
@@ -49,8 +44,6 @@ public class Collectible : MonoBehaviour
 
     private void Update()
     {
-        // Rotation continue autour de l'axe Y du monde.
-        transform.Rotate(Vector3.up, vitesseRotation * Time.deltaTime, Space.World);
 
         // Flottement vertical avec une fonction sinus (valeur entre -1 et 1).
         float decalageY = Mathf.Sin(Time.time * vitesseFlottement) * amplitudeFlottement;
