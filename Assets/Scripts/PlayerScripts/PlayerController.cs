@@ -164,7 +164,7 @@ public class PlayerController : MonoBehaviour
         // On mémorise l'instant où la touche Saut (Espace) est pressée.
         if (Input.GetButtonDown("Jump"))
         {
-            
+
             dernierAppuiSaut = Time.time;
         }
     }
